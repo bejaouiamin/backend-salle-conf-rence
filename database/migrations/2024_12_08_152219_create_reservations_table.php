@@ -18,6 +18,7 @@ return new class extends Migration
             $table->dateTime('end_time');
             $table->text('preferences')->nullable();
             $table->text('resources')->nullable();
+            $table->string('email')->nullable(); // Add email column
             $table->timestamps();
         });
     }
@@ -28,5 +29,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('reservations');
+        // Schema::table('reservations', function (Blueprint $table) {
+        //     $table->dropColumn('email');
+        // });
     }
 };
