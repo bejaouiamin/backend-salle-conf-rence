@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Reservation;
+
 
 class ReservationController extends Controller
 {
@@ -11,7 +13,7 @@ class ReservationController extends Controller
      */
     public function index()
     {
-        //
+        return Reservation::with('salle', 'user')->get();
     }
 
     /**
@@ -33,9 +35,21 @@ class ReservationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+   // Update a reservation
+   public function update(Request $request, $id)
     {
-        //
+        $reservation = Reservation::findOrFail($id);
+        $validated = $request->validate([
+            'salle_id' => 'required|exists:salles,id',
+            'user_id' => 'required|exists:users,id',
+            'start_time' => 'required|date|after:now',
+            'end_time' => 'required|date|after:start_time',
+            'preferences' => 'nullable|string',
+            'resources' => 'nullable|string',
+        ]);
+
+        $reservation->update($validated);
+        return response()->json(['message' => 'Reservation updated successfully', 'reservation' => $reservation]);
     }
 
     /**
@@ -43,6 +57,8 @@ class ReservationController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $reservation = Reservation::findOrFail($id);
+        $reservation->delete();
+        return response()->json(['message' => 'Reservation cancelled successfully']);
     }
 }

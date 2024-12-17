@@ -69,6 +69,7 @@ class SalleController extends Controller
         // Validate the request data, including email
         $validated = $request->validate([
             'salle_id' => 'required|exists:salles,id',
+            'user_id' => 'required|exists:users,id',
             'start_time' => 'required|date|after:now',
             'end_time' => 'required|date|after:start_time',
             'preferences' => 'nullable|string',
@@ -108,4 +109,5 @@ class SalleController extends Controller
     {
         return Reservation::with('salle')->get();
     }
+
 }
