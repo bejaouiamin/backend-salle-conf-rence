@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Reservation;
-
+use App\Notifications\ReservationReminder;
 
 class ReservationController extends Controller
 {
@@ -61,4 +61,16 @@ class ReservationController extends Controller
         $reservation->delete();
         return response()->json(['message' => 'Reservation cancelled successfully']);
     }
+
+    /**
+     * Send a reminder notification for a reservation.
+     */
+    public function sendReminder($reservationId)
+    {
+        $reservation = Reservation::with('salle')->findOrFail($reservationId); // Include salle relationship
+        $user = $reservation->user;
+    
+        $user->notify(new ReservationReminder($reservation));
+    }
+    
 }
