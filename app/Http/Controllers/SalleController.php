@@ -66,10 +66,9 @@ class SalleController extends Controller
 
     public function createReservation(Request $request)
     {
-        // Validate the request data, including email
+        // Validate the request data, excluding user_id
         $validated = $request->validate([
             'salle_id' => 'required|exists:salles,id',
-            'user_id' => 'required|exists:users,id',
             'start_time' => 'required|date|after:now',
             'end_time' => 'required|date|after:start_time',
             'preferences' => 'nullable|string',
@@ -89,14 +88,24 @@ class SalleController extends Controller
             return response()->json(['message' => 'La salle est déjà réservée pour cette plage horaire.'], 400);
         }
 
+        // Check if the user is authenticated
+        if (!auth()->check()) {
+            return response()->json(['message' => 'You must be logged in to make a reservation.'], 401);
+        }
+
+        // Add the authenticated user's ID if available
+        $validated['user_id'] = auth()->id();
+
+
         // Create the reservation
-        $reservation = Reservation::create($validated); // Save email along with other data
+        $reservation = Reservation::create($validated);
 
         // Send confirmation email
         $this->sendConfirmationEmail($reservation);
 
         return response()->json(['message' => 'Réservation réussie, un email de confirmation a été envoyé!', 'reservation' => $reservation]);
     }
+
 
     protected function sendConfirmationEmail($reservation)
     {
@@ -109,5 +118,4 @@ class SalleController extends Controller
     {
         return Reservation::with('salle')->get();
     }
-
 }

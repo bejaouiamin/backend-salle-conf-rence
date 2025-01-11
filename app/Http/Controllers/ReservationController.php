@@ -72,5 +72,21 @@ class ReservationController extends Controller
     
         $user->notify(new ReservationReminder($reservation));
     }
+
+    /**
+     * Get reservations for a specific user.
+     *
+     * @param int $userId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getReservationsByUserId($userId)
+    {
+        $reservations = Reservation::with('salle')
+            ->where('user_id', $userId)
+            ->orderBy('start_time', 'asc')
+            ->get();
+        
+        return response()->json($reservations);
+    }
     
 }

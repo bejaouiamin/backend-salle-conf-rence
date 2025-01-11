@@ -29,8 +29,9 @@ use App\Http\Controllers\AuthController;
 //});
 
 Route::apiResource('salles', SalleController::class);
-Route::post('reservation', [SalleController::class, 'createReservation']);
+Route::post('reservation', [SalleController::class, 'createReservation'])->middleware('auth:sanctum');
 Route::get('reservation', [SalleController::class, 'getReservations']);
+Route::get('/reservations/user/{userId}', [ReservationController::class, 'getReservationsByUserId']);
 Route::apiResource('reservations', ReservationController::class);
 
 Route::apiResource('equipment', EquipmentController::class);
@@ -40,6 +41,8 @@ Route::apiResource('reservations', ReservationController::class);
 
 Route::apiResource('users', AuthController::class);
 Route::get('users', [AuthController::class, 'getAllUsers']);
+Route::put('users/{id}/promote', [AuthController::class, 'promoteToAdmin'])->middleware('auth:sanctum');
+
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');

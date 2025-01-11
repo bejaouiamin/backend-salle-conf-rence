@@ -54,6 +54,7 @@ class AuthController extends Controller
             'message' => 'Login successful',
             'user' => $user,
             'token' => $token,
+            'userId' => $user->id, // Include userId explicitly
         ]);
     }
     public function logout(Request $request)
@@ -66,6 +67,22 @@ class AuthController extends Controller
     public function getAllUsers()
     {
         return response()->json(User::all());
+    }
+    //change role
+    public function promoteToAdmin($id)
+    {
+        // Find the user by ID
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        // Update the user's role
+        $user->role = 'admin';
+        $user->save();
+
+        return response()->json(['message' => 'User promoted to Admin successfully', 'user' => $user]);
     }
 
 }
