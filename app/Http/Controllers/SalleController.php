@@ -116,6 +116,7 @@ class SalleController extends Controller
 
     public function getReservations()
     {
-        return Reservation::with('salle')->get();
+        return Reservation::with(['salle', 'user'])->get();
     }
+
 }

@@ -67,11 +67,17 @@ class ReservationController extends Controller
      */
     public function sendReminder($reservationId)
     {
-        $reservation = Reservation::with('salle')->findOrFail($reservationId); // Include salle relationship
+        $reservation = Reservation::with('salle', 'user')->findOrFail($reservationId);
         $user = $reservation->user;
-    
-        $user->notify(new ReservationReminder($reservation));
+
+        if ($user && $user->role === 'user') {
+            $user->notify(new ReservationReminder($reservation));
+            return response()->json(['message' => 'Reminder sent successfully']);
+        }
+
+        return response()->json(['message' => 'Reminder not sent. User does not have the correct role.'], 403);
     }
+
 
     /**
      * Get reservations for a specific user.
@@ -85,8 +91,8 @@ class ReservationController extends Controller
             ->where('user_id', $userId)
             ->orderBy('start_time', 'asc')
             ->get();
-        
+
         return response()->json($reservations);
     }
-    
+
 }
